@@ -131,7 +131,7 @@ endif ()
 
 option(ENABLE_TESTING "Enable smoke tests" OFF)
 
-#if (ENABLE_TESTING)
+if (ENABLE_TESTING)
     enable_testing()
 
     set(BUILD_GTEST ON)
@@ -151,7 +151,7 @@ option(ENABLE_TESTING "Enable smoke tests" OFF)
 
     add_subdirectory(third-party/googletest)
     add_subdirectory(testing)
-#endif (ENABLE_TESTING)
+endif (ENABLE_TESTING)
 
 
 # Documentation generation
