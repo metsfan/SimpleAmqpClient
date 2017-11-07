@@ -17,31 +17,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="689bd006-6b7b-4ef6-a99b-f25110333f46" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/testing/test_api" afterPath="$PROJECT_DIR$/cmake-build-debug/testing/test_api" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/libgtest.a" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/libgtest.a" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/libgtest_main.a" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/libgtest_main.a" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/CTestTestfile.cmake" afterPath="$PROJECT_DIR$/cmake-build-debug/CTestTestfile.cmake" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/SimpleAmqpClient.cbp" afterPath="$PROJECT_DIR$/cmake-build-debug/SimpleAmqpClient.cbp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/libSimpleAmqpClient.pc" afterPath="$PROJECT_DIR$/cmake-build-debug/libSimpleAmqpClient.pc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/testing/CTestTestfile.cmake" afterPath="$PROJECT_DIR$/cmake-build-debug/testing/CTestTestfile.cmake" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/testing/Makefile" afterPath="$PROJECT_DIR$/cmake-build-debug/testing/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/CTestTestfile.cmake" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/CTestTestfile.cmake" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/Makefile" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/CTestTestfile.cmake" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/CTestTestfile.cmake" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/Makefile" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gmock.cbp" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gmock.cbp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/CTestTestfile.cmake" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/CTestTestfile.cmake" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/Makefile" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/gtest.cbp" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googlemock/gtest/gtest.cbp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googletest-distribution.cbp" afterPath="$PROJECT_DIR$/cmake-build-debug/third-party/googletest/googletest-distribution.cbp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ChannelImpl.cpp" afterPath="$PROJECT_DIR$/src/ChannelImpl.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Connection.cpp" afterPath="$PROJECT_DIR$/src/Connection.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/SimpleAmqpClient/ChannelImpl.h" afterPath="$PROJECT_DIR$/src/SimpleAmqpClient/ChannelImpl.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/SimpleAmqpClient/Connection.h" afterPath="$PROJECT_DIR$/src/SimpleAmqpClient/Connection.h" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -66,8 +43,8 @@
       <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="15" column="6" lean-forward="true" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
+            <state relative-caret-position="324">
+              <caret line="18" column="7" lean-forward="false" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -539,10 +516,11 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4454000" />
+    <option name="totallyTimeSpent" value="4575000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="-4" width="2495" height="1444" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33612168" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -551,7 +529,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32945737" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32927758" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19763169" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19763169" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32927758" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39847907" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -971,8 +949,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="6" lean-forward="true" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
+        <state relative-caret-position="324">
+          <caret line="18" column="7" lean-forward="false" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
           <folding />
         </state>
       </provider>
