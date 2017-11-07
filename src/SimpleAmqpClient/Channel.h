@@ -32,6 +32,7 @@
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
+#include "SimpleAmqpClient/Connection.h"
 
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
@@ -91,14 +92,6 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                        frame_max);
   }
 
- protected:
-  struct SSLConnectionParams {
-    std::string path_to_ca_cert;
-    std::string path_to_client_key;
-    std::string path_to_client_cert;
-    bool verify_hostname;
-  };
-
  public:
   /**
   * Creates a new channel object
@@ -135,7 +128,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                             const std::string &vhost = "/",
                             int frame_max = 131072,
                             bool verify_hostname = true) {
-    SSLConnectionParams ssl_params;
+    Connection::SSLConnectionParams ssl_params;
     ssl_params.path_to_ca_cert = path_to_ca_cert;
     ssl_params.path_to_client_key = path_to_client_key;
     ssl_params.path_to_client_cert = path_to_client_cert;
@@ -177,7 +170,14 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                    const std::string &path_to_client_key = "",
                                    const std::string &path_to_client_cert = "",
                                    bool verify_hostname = true,
+
                                    int frame_max = 131072);
+  /** Create a new Channel object from an existing Connection
+   *
+   * @param connection The connection to open this channel from
+   * @return a new Channel object;
+   */
+  static ptr_t CreateFromConnection(Connection::ptr_t connection);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
@@ -186,7 +186,9 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
                    const std::string &vhost, int frame_max,
-                   const SSLConnectionParams &ssl_params);
+                   const Connection::SSLConnectionParams &ssl_params);
+
+  explicit Channel(Connection::ptr_t connection);
 
  public:
   virtual ~Channel();
@@ -769,6 +771,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
 
  protected:
   boost::scoped_ptr<Detail::ChannelImpl> m_impl;
+
+  AmqpClient::Connection::ptr_t m_connection;
 };
 
 }  // namespace AmqpClient

@@ -112,79 +112,18 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
                  int frame_max)
     : m_impl(new Detail::ChannelImpl) {
-  m_impl->m_connection = amqp_new_connection();
 
-  if (NULL == m_impl->m_connection) {
-    throw std::bad_alloc();
-  }
-
-  try {
-    amqp_socket_t *socket = amqp_tcp_socket_new(m_impl->m_connection);
-    int sock = amqp_socket_open(socket, host.c_str(), port);
-    m_impl->CheckForError(sock);
-
-    m_impl->DoLogin(username, password, vhost, frame_max);
-  } catch (...) {
-    amqp_destroy_connection(m_impl->m_connection);
-    throw;
-  }
-
-  m_impl->SetIsConnected(true);
+  m_connection = boost::make_shared<Connection>(host, port, username, password, vhost, frame_max);
+  m_impl->m_connection = m_connection;
 }
 
 #ifdef SAC_SSL_SUPPORT_ENABLED
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
-                 int frame_max, const SSLConnectionParams &ssl_params)
+                 int frame_max, const Connection::SSLConnectionParams &ssl_params)
     : m_impl(new Detail::ChannelImpl) {
-  m_impl->m_connection = amqp_new_connection();
-  if (NULL == m_impl->m_connection) {
-    throw std::bad_alloc();
-  }
-
-  amqp_socket_t *socket = amqp_ssl_socket_new(m_impl->m_connection);
-  if (NULL == socket) {
-    throw std::bad_alloc();
-  }
-#if AMQP_VERSION >= 0x00080001
-  amqp_ssl_socket_set_verify_peer(socket, ssl_params.verify_hostname);
-  amqp_ssl_socket_set_verify_hostname(socket, ssl_params.verify_hostname);
-#else
-  amqp_ssl_socket_set_verify(socket, ssl_params.verify_hostname);
-#endif
-
-  try {
-    int status =
-        amqp_ssl_socket_set_cacert(socket, ssl_params.path_to_ca_cert.c_str());
-    if (status) {
-      throw AmqpLibraryException::CreateException(
-          status, "Error setting CA certificate for socket");
-    }
-
-    if (ssl_params.path_to_client_key != "" &&
-        ssl_params.path_to_client_cert != "") {
-      status = amqp_ssl_socket_set_key(socket,
-                                       ssl_params.path_to_client_cert.c_str(),
-                                       ssl_params.path_to_client_key.c_str());
-      if (status) {
-        throw AmqpLibraryException::CreateException(
-            status, "Error setting client certificate for socket");
-      }
-    }
-
-    status = amqp_socket_open(socket, host.c_str(), port);
-    if (status) {
-      throw AmqpLibraryException::CreateException(
-          status, "Error setting client certificate for socket");
-    }
-
-    m_impl->DoLogin(username, password, vhost, frame_max);
-  } catch (...) {
-    amqp_destroy_connection(m_impl->m_connection);
-    throw;
-  }
-
-  m_impl->SetIsConnected(true);
+  m_connection = boost::make_shared<Connection>(host, port, username, password, vhost, frame_max, ssl_params);
+  m_impl->m_connection = m_connection;
 }
 #else
 Channel::Channel(const std::string &, int, const std::string &,
@@ -195,9 +134,13 @@ Channel::Channel(const std::string &, int, const std::string &,
 }
 #endif
 
+Channel::Channel(Connection::ptr_t connection)
+    : m_impl(new Detail::ChannelImpl) {
+  m_connection = connection;
+  m_impl->m_connection = m_connection;
+}
+
 Channel::~Channel() {
-  amqp_connection_close(m_impl->m_connection, AMQP_REPLY_SUCCESS);
-  amqp_destroy_connection(m_impl->m_connection);
 }
 
 void Channel::DeclareExchange(const std::string &exchange_name,
@@ -471,7 +414,7 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
   }
 
   m_impl->CheckForError(
-      amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, false));
+      amqp_basic_ack(m_connection->GetConnectionState(), channel, info.delivery_tag, false));
 }
 
 void Channel::BasicReject(const Envelope::ptr_t &message, bool requeue,
@@ -496,7 +439,7 @@ void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue,
   req.multiple = multiple;
   req.requeue = requeue;
 
-  m_impl->CheckForError(amqp_send_method(m_impl->m_connection, channel,
+  m_impl->CheckForError(amqp_send_method(m_connection->GetConnectionState(), channel,
                                          AMQP_BASIC_NACK_METHOD, &req));
 }
 
@@ -508,7 +451,7 @@ void Channel::BasicPublish(const std::string &exchange_name,
   amqp_channel_t channel = m_impl->GetChannel();
 
   m_impl->CheckForError(amqp_basic_publish(
-      m_impl->m_connection, channel, amqp_cstring_bytes(exchange_name.c_str()),
+      m_connection->GetConnectionState(), channel, amqp_cstring_bytes(exchange_name.c_str()),
       amqp_cstring_bytes(routing_key.c_str()), mandatory, immediate,
       message->getAmqpProperties(), message->getAmqpBody()));
 

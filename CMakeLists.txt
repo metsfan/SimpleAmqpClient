@@ -112,6 +112,9 @@ SET(SAC_LIB_SRCS
 
     src/SimpleAmqpClient/TableImpl.h
     src/TableImpl.cpp
+
+    src/SimpleAmqpClient/Connection.h
+    src/Connection.cpp
     )
 
 
@@ -128,7 +131,7 @@ endif ()
 
 option(ENABLE_TESTING "Enable smoke tests" OFF)
 
-if (ENABLE_TESTING)
+#if (ENABLE_TESTING)
     enable_testing()
 
     set(BUILD_GTEST ON)
@@ -148,7 +151,7 @@ if (ENABLE_TESTING)
 
     add_subdirectory(third-party/googletest)
     add_subdirectory(testing)
-endif (ENABLE_TESTING)
+#endif (ENABLE_TESTING)
 
 
 # Documentation generation
@@ -169,6 +172,7 @@ INSTALL(FILES
     src/SimpleAmqpClient/BadUriException.h
     src/SimpleAmqpClient/BasicMessage.h
     src/SimpleAmqpClient/Channel.h
+    src/SimpleAmqpClient/Connection.h
     src/SimpleAmqpClient/ConnectionClosedException.h
     src/SimpleAmqpClient/ConsumerCancelledException.h
     src/SimpleAmqpClient/ConsumerTagNotFoundException.h

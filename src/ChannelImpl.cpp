@@ -62,41 +62,12 @@ ChannelImpl::ChannelImpl() : m_last_used_channel(0), m_is_connected(false) {
 
 ChannelImpl::~ChannelImpl() {}
 
-void ChannelImpl::DoLogin(const std::string &username,
-                          const std::string &password, const std::string &vhost,
-                          int frame_max) {
-  amqp_table_entry_t capabilties[1];
-  amqp_table_entry_t capability_entry;
-  amqp_table_t client_properties;
-
-  capabilties[0].key = amqp_cstring_bytes("consumer_cancel_notify");
-  capabilties[0].value.kind = AMQP_FIELD_KIND_BOOLEAN;
-  capabilties[0].value.value.boolean = 1;
-
-  capability_entry.key = amqp_cstring_bytes("capabilities");
-  capability_entry.value.kind = AMQP_FIELD_KIND_TABLE;
-  capability_entry.value.value.table.num_entries =
-      sizeof(capabilties) / sizeof(amqp_table_entry_t);
-  capability_entry.value.value.table.entries = capabilties;
-
-  client_properties.num_entries = 1;
-  client_properties.entries = &capability_entry;
-
-  CheckRpcReply(
-      0, amqp_login_with_properties(m_connection, vhost.c_str(), 0, frame_max,
-                                    BROKER_HEARTBEAT, &client_properties,
-                                    AMQP_SASL_METHOD_PLAIN, username.c_str(),
-                                    password.c_str()));
-
-  m_brokerVersion = ComputeBrokerVersion(m_connection);
-}
-
 amqp_channel_t ChannelImpl::GetNextChannelId() {
   channel_state_list_t::iterator unused_channel =
       std::find(m_channels.begin(), m_channels.end(), CS_Closed);
 
   if (m_channels.end() == unused_channel) {
-    int max_channels = amqp_get_channel_max(m_connection);
+    int max_channels = amqp_get_channel_max(m_connection->GetConnectionState());
     if (0 == max_channels) {
       max_channels = std::numeric_limits<uint16_t>::max();
     }
@@ -163,40 +134,14 @@ void ChannelImpl::FinishCloseChannel(amqp_channel_t channel) {
   m_channels.at(channel) = CS_Closed;
 
   amqp_channel_close_ok_t close_ok;
-  CheckForError(amqp_send_method(m_connection, channel,
+  CheckForError(amqp_send_method(m_connection->GetConnectionState(), channel,
                                  AMQP_CHANNEL_CLOSE_OK_METHOD, &close_ok));
 }
 
 void ChannelImpl::FinishCloseConnection() {
   SetIsConnected(false);
   amqp_connection_close_ok_t close_ok;
-  amqp_send_method(m_connection, 0, AMQP_CONNECTION_CLOSE_OK_METHOD, &close_ok);
-}
-
-void ChannelImpl::CheckRpcReply(amqp_channel_t channel,
-                                const amqp_rpc_reply_t &reply) {
-  switch (reply.reply_type) {
-    case AMQP_RESPONSE_NORMAL:
-      return;
-      break;
-
-    case AMQP_RESPONSE_LIBRARY_EXCEPTION:
-      // If we're getting this likely is the socket is already closed
-      throw AmqpResponseLibraryException::CreateException(reply, "");
-      break;
-
-    case AMQP_RESPONSE_SERVER_EXCEPTION:
-      if (reply.reply.id == AMQP_CHANNEL_CLOSE_METHOD) {
-        FinishCloseChannel(channel);
-      } else if (reply.reply.id == AMQP_CONNECTION_CLOSE_METHOD) {
-        FinishCloseConnection();
-      }
-      AmqpException::Throw(reply);
-      break;
-
-    default:
-      AmqpException::Throw(reply);
-  }
+  amqp_send_method(m_connection->GetConnectionState(), 0, AMQP_CONNECTION_CLOSE_OK_METHOD, &close_ok);
 }
 
 void ChannelImpl::CheckForError(int ret) {
@@ -399,7 +344,7 @@ bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame,
     tvp = &tv_timeout;
   }
 
-  int ret = amqp_simple_wait_frame_noblock(m_connection, &frame, tvp);
+  int ret = amqp_simple_wait_frame_noblock(m_connection->GetConnectionState(), &frame, tvp);
 
   if (AMQP_STATUS_TIMEOUT == ret) {
     return false;
@@ -436,59 +381,14 @@ void ChannelImpl::MaybeReleaseBuffersOnChannel(amqp_channel_t channel) {
   if (m_frame_queue.end() ==
       std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
                    boost::bind(&ChannelImpl::is_on_channel, _1, channel))) {
-    amqp_maybe_release_buffers_on_channel(m_connection, channel);
+    amqp_maybe_release_buffers_on_channel(m_connection->GetConnectionState(), channel);
   }
 }
 
 void ChannelImpl::CheckIsConnected() {
-  if (!m_is_connected) {
+  if (!m_connection->IsConnected()) {
     throw ConnectionClosedException();
   }
-}
-
-namespace {
-bool bytesEqual(amqp_bytes_t r, amqp_bytes_t l) {
-  if (r.len == l.len) {
-    if (0 == memcmp(r.bytes, l.bytes, r.len)) {
-      return true;
-    }
-  }
-  return false;
-}
-}
-
-boost::uint32_t ChannelImpl::ComputeBrokerVersion(
-    amqp_connection_state_t state) {
-  const amqp_table_t *properties = amqp_get_server_properties(state);
-  const amqp_bytes_t version = amqp_cstring_bytes("version");
-  amqp_table_entry_t *version_entry = NULL;
-
-  for (int i = 0; i < properties->num_entries; ++i) {
-    if (bytesEqual(properties->entries[i].key, version)) {
-      version_entry = &properties->entries[i];
-      break;
-    }
-  }
-  if (NULL == version_entry) {
-    return 0;
-  }
-
-  std::string version_string(
-      static_cast<char *>(version_entry->value.value.bytes.bytes),
-      version_entry->value.value.bytes.len);
-  std::vector<std::string> version_components;
-  boost::split(version_components, version_string, boost::is_any_of("."));
-  if (version_components.size() != 3) {
-    return 0;
-  }
-  boost::uint32_t version_major =
-      boost::lexical_cast<boost::uint32_t>(version_components[0]);
-  boost::uint32_t version_minor =
-      boost::lexical_cast<boost::uint32_t>(version_components[1]);
-  boost::uint32_t version_patch =
-      boost::lexical_cast<boost::uint32_t>(version_components[2]);
-  return (version_major & 0xFF) << 16 | (version_minor & 0xFF) << 8 |
-         (version_patch & 0xFF);
 }
 
 }  // namespace Detail

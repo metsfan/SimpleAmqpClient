@@ -34,6 +34,7 @@
 
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Connection.h"
 #include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
@@ -59,8 +60,6 @@ class ChannelImpl : boost::noncopyable {
   typedef std::map<amqp_channel_t, frame_queue_t> channel_map_t;
   typedef channel_map_t::iterator channel_map_iterator_t;
 
-  void DoLogin(const std::string &username, const std::string &password,
-               const std::string &vhost, int frame_max);
   amqp_channel_t GetChannel();
   void ReturnChannel(amqp_channel_t channel);
   bool IsChannelOpen(amqp_channel_t channel);
@@ -213,7 +212,7 @@ class ChannelImpl : boost::noncopyable {
   amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, boost::uint32_t method_id,
                               void *decoded,
                               const ResponseListType &expected_responses) {
-    CheckForError(amqp_send_method(m_connection, channel, method_id, decoded));
+    CheckForError(amqp_send_method(m_connection->GetConnectionState(), channel, method_id, decoded));
 
     amqp_frame_t response;
     boost::array<amqp_channel_t, 1> channels = {{channel}};
@@ -337,13 +336,11 @@ class ChannelImpl : boost::noncopyable {
   // Newer versions of RabbitMQ basic.qos.global set to false applies to new
   // consumers made on the channel, and true applies to all consumers on the
   // channel (not connection).
-  bool BrokerHasNewQosBehavior() const { return 0x030300 <= m_brokerVersion; }
+  bool BrokerHasNewQosBehavior() const { return 0x030300 <= m_connection->GetBrokerVersion(); }
 
-  amqp_connection_state_t m_connection;
+  Connection::ptr_t m_connection;
 
  private:
-  static boost::uint32_t ComputeBrokerVersion(
-      const amqp_connection_state_t state);
 
   frame_queue_t m_frame_queue;
 
@@ -357,7 +354,6 @@ class ChannelImpl : boost::noncopyable {
   typedef std::vector<channel_state_t> channel_state_list_t;
 
   channel_state_list_t m_channels;
-  boost::uint32_t m_brokerVersion;
   // A channel that is likely to be an CS_Open state
   amqp_channel_t m_last_used_channel;
 
