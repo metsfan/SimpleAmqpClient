@@ -276,4 +276,10 @@ boost::uint32_t Connection::ComputeBrokerVersion(
          (version_patch & 0xFF);
 }
 
+void Connection::FinishCloseConnection() {
+  SetIsConnected(false);
+  amqp_connection_close_ok_t close_ok;
+  amqp_send_method(m_connection, 0, AMQP_CONNECTION_CLOSE_OK_METHOD, &close_ok);
+}
+
 }

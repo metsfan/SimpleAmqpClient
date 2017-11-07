@@ -56,7 +56,7 @@
 namespace AmqpClient {
 namespace Detail {
 
-ChannelImpl::ChannelImpl() : m_last_used_channel(0), m_is_connected(false) {
+ChannelImpl::ChannelImpl() : m_last_used_channel(0) {
   m_channels.push_back(CS_Used);
 }
 
@@ -138,12 +138,6 @@ void ChannelImpl::FinishCloseChannel(amqp_channel_t channel) {
                                  AMQP_CHANNEL_CLOSE_OK_METHOD, &close_ok));
 }
 
-void ChannelImpl::FinishCloseConnection() {
-  SetIsConnected(false);
-  amqp_connection_close_ok_t close_ok;
-  amqp_send_method(m_connection->GetConnectionState(), 0, AMQP_CONNECTION_CLOSE_OK_METHOD, &close_ok);
-}
-
 void ChannelImpl::CheckForError(int ret) {
   if (ret < 0) {
     throw AmqpLibraryException::CreateException(ret);
@@ -206,25 +200,6 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel) {
     received_size += frame.payload.body_fragment.len;
   }
   return BasicMessage::Create(body, properties);
-}
-
-void ChannelImpl::CheckFrameForClose(amqp_frame_t &frame,
-                                     amqp_channel_t channel) {
-  if (frame.frame_type == AMQP_FRAME_METHOD) {
-    switch (frame.payload.method.id) {
-      case AMQP_CHANNEL_CLOSE_METHOD:
-        FinishCloseChannel(channel);
-        AmqpException::Throw(*reinterpret_cast<amqp_channel_close_t *>(
-            frame.payload.method.decoded));
-        break;
-
-      case AMQP_CONNECTION_CLOSE_METHOD:
-        FinishCloseConnection();
-        AmqpException::Throw(*reinterpret_cast<amqp_connection_close_t *>(
-            frame.payload.method.decoded));
-        break;
-    }
-  }
 }
 
 void ChannelImpl::AddConsumer(const std::string &consumer_tag,

@@ -14,3 +14,7 @@ ipch/
 install_manifest.txt
 .ycm_extra_conf.py*
 *.orig
+
+cmake-build-debug/*
+.idea/*
+build/*

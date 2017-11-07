@@ -178,6 +178,8 @@ public:
 
   boost::uint32_t GetBrokerVersion() { return m_brokerVersion; }
   amqp_connection_state_t GetConnectionState() { return m_connection; }
+  bool IsConnected() { return m_is_connected; }
+  void FinishCloseConnection();
 
 private:
   amqp_connection_state_t m_connection;
@@ -187,10 +189,11 @@ private:
   void CheckForError(int ret);
   void DoLogin(const std::string &username, const std::string &password,
                const std::string &vhost, int frame_max);
-  void SetIsConnected(bool state) { m_is_connected = state; }
+
   static boost::uint32_t ComputeBrokerVersion(
           const amqp_connection_state_t state);
   void CheckRpcReply(const amqp_rpc_reply_t &reply);
+  void SetIsConnected(bool state) { m_is_connected = state; }
 };
 
 }

@@ -94,7 +94,7 @@ class ChannelImpl : boost::noncopyable {
         // method
         if (AMQP_FRAME_METHOD == frame.frame_type &&
             AMQP_CONNECTION_CLOSE_METHOD == frame.payload.method.id) {
-          FinishCloseConnection();
+          m_connection->FinishCloseConnection();
           AmqpException::Throw(*reinterpret_cast<amqp_connection_close_t *>(
               frame.payload.method.decoded));
         }
@@ -311,12 +311,9 @@ class ChannelImpl : boost::noncopyable {
   amqp_channel_t CreateNewChannel();
   amqp_channel_t GetNextChannelId();
 
-  void CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t &reply);
   void CheckForError(int ret);
 
-  void CheckFrameForClose(amqp_frame_t &frame, amqp_channel_t channel);
   void FinishCloseChannel(amqp_channel_t channel);
-  void FinishCloseConnection();
 
   MessageReturnedException CreateMessageReturnedException(
       amqp_basic_return_t &return_method, amqp_channel_t channel);
@@ -329,7 +326,6 @@ class ChannelImpl : boost::noncopyable {
 
   void MaybeReleaseBuffersOnChannel(amqp_channel_t channel);
   void CheckIsConnected();
-  void SetIsConnected(bool state) { m_is_connected = state; }
 
   // The RabbitMQ broker changed the way that basic.qos worked as of v3.3.0.
   // See: http://www.rabbitmq.com/consumer-prefetch.html
@@ -356,8 +352,6 @@ class ChannelImpl : boost::noncopyable {
   channel_state_list_t m_channels;
   // A channel that is likely to be an CS_Open state
   amqp_channel_t m_last_used_channel;
-
-  bool m_is_connected;
 };
 
 }  // namespace Detail
