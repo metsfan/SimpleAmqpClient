@@ -108,6 +108,10 @@ Channel::ptr_t Channel::CreateSecureFromUri(
       "CreateSecureFromUri only supports SSL-enabled URIs.");
 }
 
+Channel::ptr_t Channel::Create(Connection::ptr_t connection) {
+  return boost::make_shared<Channel>(connection);
+}
+
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
                  int frame_max)

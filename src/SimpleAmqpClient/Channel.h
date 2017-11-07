@@ -177,7 +177,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * @param connection The connection to open this channel from
    * @return a new Channel object;
    */
-  static ptr_t CreateFromConnection(Connection::ptr_t connection);
+  static ptr_t Create(Connection::ptr_t connection);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
